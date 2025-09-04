@@ -1,152 +1,161 @@
-import React, { useEffect, useState, useRef } from "react";
+/**
+ * Results.jsx
+ * Displays quiz results, high score tracking, and detailed answer breakdown.
+ * Integrates Confetti animation for new high scores.
+ */
+
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchQuestionsForDifficulty } from "../utils/api";
-import QuestionCard from "../components/QuestionCard";
-import ProgressBar from "../components/ProgressBar";
+import { motion } from "framer-motion";
+import Confetti from "react-confetti"; // 🎉 for celebrating new high scores
+import PrimaryButton from "../components/PrimaryButton";
 
-export default function Quiz() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const difficulty = (location.state && location.state.difficulty) || "easy";
+export default function Results() {
+  const location = useLocation(); // get state passed from Quiz page
+  const navigate = useNavigate(); // navigation helper
+  const state = location.state || {}; // handle undefined state
+  const answers = state.answers || []; // array of user's answers
 
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState([]); // {selected, correct, question}
-  const [selected, setSelected] = useState(null);
-  const [locked, setLocked] = useState(false);
+  // --- Compute score from answers ---
+  const score = useMemo(() => answers.filter((a) => a.isCorrect).length, [answers]);
+  const difficulty = state.difficulty || "easy"; // default to easy
 
-  // Timer
-  const [timeLeft, setTimeLeft] = useState(30);
-  const timerRef = useRef(null);
+  const [highScore, setHighScore] = useState(0); // stores high score from localStorage
+  const [showConfetti, setShowConfetti] = useState(false); // trigger confetti animation
 
+  /**
+   * Store and compare high scores using localStorage.
+   * If current score beats previous high score, show confetti.
+   */
   useEffect(() => {
-    setLoading(true);
-    setError("");
-    fetchQuestionsForDifficulty(difficulty)
-      .then((res) => {
-        setQuestions(res);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Failed to load questions");
-        setLoading(false);
-      });
-  }, [difficulty]);
+    const key = `quiz_highscore_${difficulty}`;
+    const existing = Number(localStorage.getItem(key) || 0);
 
-  useEffect(() => {
-    // reset when question changes
-    setSelected(null);
-    setLocked(false);
-    setTimeLeft(30);
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((t) => t - 1);
-    }, 1000);
-    return () => clearInterval(timerRef.current);
-  }, [index, questions]);
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      // lock and move on automatically after 700ms
-      handleLockSelection(null, true);
+    if (score > existing) {
+      localStorage.setItem(key, String(score));
+      setHighScore(score);
+      setShowConfetti(true); // trigger celebration
+    } else {
+      setHighScore(existing);
     }
-  }, [timeLeft]);
+  }, [score, difficulty]);
 
-  function handleSelect(opt) {
-    setSelected(opt);
+  // --- Navigation handlers ---
+  function restart() {
+    navigate("/quiz", { state: { difficulty } }); // restart quiz with same difficulty
   }
 
-  function handleLockSelection(opt = null, timedOut = false) {
-    // lock current selection, compute immediate correctness
-    const current = questions[index];
-    const sel = opt === null ? selected : opt;
-    const record = {
-      question: current.question,
-      selected: sel,
-      correct: current.correct_answer,
-      isCorrect: sel === current.correct_answer,
-      timedOut: timedOut && sel == null
-    };
-    setAnswers((prev) => [...prev, record]);
-    setLocked(true);
-    // small delay then move
-    setTimeout(() => {
-      if (index + 1 < questions.length) {
-        setIndex((i) => i + 1);
-      } else {
-        // finish -> go to results
-        navigate("/results", { state: { answers: [...answers, record], difficulty } });
-      }
-    }, 700);
+  function goHome() {
+    navigate("/"); // navigate back to home page
   }
 
-  function handleNext() {
-    if (!selected) return; // prevent move
-    handleLockSelection(selected, false);
-  }
-
-  function handleFinish() {
-    if (!selected) return;
-    handleLockSelection(selected, false);
-  }
-
-  if (loading) return <div className="bg-white rounded-2xl p-6 shadow">Loading questions…</div>;
-  if (error) return <div className="bg-white rounded-2xl p-6 shadow text-red-600">Error: {error}</div>;
-  if (!questions.length) return <div className="bg-white rounded-2xl p-6 shadow">No questions found.</div>;
-
-  const current = questions[index];
-
-  return (
-    <div className="max-w-2xl mx-auto grid gap-6">
-      <div className="bg-white rounded-2xl p-6 shadow">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">Difficulty: <strong className="capitalize">{difficulty}</strong></div>
-          <div className="text-sm text-gray-600">Time: <strong>{timeLeft}s</strong></div>
-        </div>
-
+  // --- Render fallback if no quiz has been taken ---
+  if (!answers.length) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="bg-white rounded-2xl p-6 shadow max-w-md mx-auto mt-12 text-center"
+      >
+        <h2 className="text-xl font-semibold">No results yet</h2>
+        <p className="text-sm text-gray-600">Please take a quiz first.</p>
         <div className="mt-4">
-          <ProgressBar current={index + 1} total={questions.length} />
-          <QuestionCard
-            question={current.question}
-            options={current.options}
-            selected={selected}
-            onSelect={handleSelect}
-            locked={locked}
-            correctAnswer={current.correct_answer}
-          />
+          <PrimaryButton onClick={() => navigate("/difficulty")}>Start Quiz</PrimaryButton>
         </div>
+      </motion.div>
+    );
+  }
 
-        <div className="mt-4 flex items-center justify-between">
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 rounded-lg border hover:bg-red-100"
-          >
-            Cancel
-          </button>
+  // --- Main results view ---
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="max-w-3xl mx-auto grid gap-6 mt-8 relative"
+    >
+      {/* Confetti animation if new high score */}
+      {showConfetti && <Confetti numberOfPieces={300} recycle={false} gravity={0.2} />}
 
-          <div className="flex items-center gap-3">
-            {index + 1 < questions.length ? (
-              <button
-                onClick={handleNext}
-                className={`px-4 py-2 rounded-lg text-white ${selected ? "bg-brand-900" : "bg-gray-300 cursor-not-allowed"}`}
-                aria-disabled={!selected}
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                onClick={handleFinish}
-                className={`px-4 py-2 rounded-lg text-white ${selected ? "bg-brand-900" : "bg-gray-300 cursor-not-allowed"}`}
-                aria-disabled={!selected}
-              >
-                Finish Quiz
-              </button>
-            )}
-          </div>
+      {/* Quiz summary card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-white rounded-2xl p-6 shadow text-center"
+      >
+        <h2 className="text-2xl font-bold mb-2">Your Quiz Result</h2>
+        <p className="text-gray-700 mb-3">
+          You scored <strong>{score}/{answers.length}</strong>
+        </p>
+        <p className="text-sm text-gray-500 mb-3">
+          High Score ({difficulty}): {highScore}/{answers.length}
+        </p>
+
+        <div className="flex items-center justify-center gap-3">
+          {/* Action buttons */}
+          <PrimaryButton onClick={goHome}>Go to Home</PrimaryButton>
+          <PrimaryButton onClick={restart}>Restart Quiz</PrimaryButton>
+        </div>
+      </motion.div>
+
+      {/* Detailed answer breakdown */}
+      <div className="bg-white rounded-2xl p-6 shadow">
+        <h3 className="text-lg font-semibold mb-3">Answer Breakdown</h3>
+        <div className="space-y-4">
+          {answers.map((a, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: idx * 0.05 }} // staggered animation
+              className="p-4 rounded-lg border"
+            >
+              {/* Question */}
+              <div className="mb-2 text-gray-700 font-medium">
+                Q{idx + 1}: {a.question}
+              </div>
+
+              {/* Answers */}
+              <div className="text-sm space-y-1">
+                {/* User's answer with color based on correctness */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.2, delay: idx * 0.05 + 0.1 }}
+                  className={a.isCorrect ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}
+                >
+                  Your answer: {a.selected ?? "(no answer)"}
+                </motion.div>
+
+                {/* Correct answer */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25, delay: idx * 0.05 + 0.15 }}
+                >
+                  Correct answer: <span className="font-medium">{a.correct}</span>
+                </motion.div>
+
+                {/* Timeout info */}
+                {a.timedOut && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25, delay: idx * 0.05 + 0.2 }}
+                    className="text-xs text-gray-500"
+                  >
+                    Auto-locked due to timeout
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

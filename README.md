@@ -42,7 +42,7 @@ Built with React, TailwindCSS, and Framer Motion, the app provides a smooth, res
 
 • Local Storage: For high score tracking
 
-• Optional Effects: React Confetti (for celebratory effects on high scores)
+• React Confetti (for celebratory effects on high scores or your current score beats the previous high score)
 
 ## Installation
 

@@ -1,3 +1,8 @@
+/**
+ * PrimaryButton.jsx
+ * Reusable button component with gradient, hover/active effects, disabled state, and optional custom classes.
+ */
+
 export default function PrimaryButton({ children, onClick, disabled, className = "" }) {
   return (
     <button
@@ -7,7 +12,7 @@ export default function PrimaryButton({ children, onClick, disabled, className =
                   ${disabled ? "bg-gray-300 cursor-not-allowed" : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:scale-105 active:scale-95"}
                   ${className}`}
     >
-      {children}
+      {children} {/* Button text or nested elements */}
     </button>
   );
 }
