@@ -121,9 +121,9 @@ export default function Quiz() {
         <div className="mt-4 flex items-center justify-between">
           <button
             onClick={() => navigate("/")}
-            className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+            className="px-4 py-2 rounded-lg border hover:bg-red-100"
           >
-            Exit
+            Cancel
           </button>
 
           <div className="flex items-center gap-3">
