@@ -7,25 +7,41 @@ Built with React, TailwindCSS, and Framer Motion, the app provides a smooth, res
 ## Features
 
 • Multiple Difficulty Levels: Choose from Easy, Medium, or Hard quizzes.
+
 • Timed Challenges: Each question has a 30-second timer to keep the quiz engaging.
+
 • Real-time Progress Tracking: Visual progress bar to see how far you are in the quiz.
+
 • Answer Locking & Skipping: Lock your answer, skip tough questions, or move to the next question seamlessly.
+
 • High Score Tracking: Local storage keeps track of your highest scores for each difficulty.
+
 • Interactive Animations: Smooth pop-in and hover animations using Framer Motion.
+
 • Responsive Layout: Works on desktop, tablet, and mobile devices.
+
 • Dark Mode Support: Toggle between light and dark themes.
+
 • Reusable Components: PrimaryButton, QuestionCard, and ProgressBar for consistent UI.
+
 • Easy Navigation: Home → Difficulty → Quiz → Results flow.
+
 • User Feedback: Correct/incorrect answer feedback and time-out handling.
 
 ## Tech Stack
 
 • Frontend: React.js, TailwindCSS, Framer Motion
+
 • Routing: React Router DOM
+
 • State Management: React Hooks (useState, useEffect, useRef)
+
 • Animations: Framer Motion for smooth transitions
+
 • Icons: Lucide React
+
 • Local Storage: For high score tracking
+
 • Optional Effects: React Confetti (for celebratory effects on high scores)
 
 ## Installation
