@@ -1,0 +1,29 @@
+{
+  "results": [
+    {
+      "question": "Which scientist proposed the three laws of motion?",
+      "correct_answer": "Isaac Newton",
+      "incorrect_answers": ["Albert Einstein", "Galileo Galilei", "Nikola Tesla"]
+    },
+    {
+      "question": "What is the capital city of Canada?",
+      "correct_answer": "Ottawa",
+      "incorrect_answers": ["Toronto", "Vancouver", "Montreal"]
+    },
+    {
+      "question": "Which planet has the most moons in the Solar System?",
+      "correct_answer": "Saturn",
+      "incorrect_answers": ["Jupiter", "Uranus", "Neptune"]
+    },
+    {
+      "question": "Which data structure uses FIFO (First In, First Out)?",
+      "correct_answer": "Queue",
+      "incorrect_answers": ["Stack", "Tree", "Graph"]
+    },
+    {
+      "question": "What is the powerhouse of the cell?",
+      "correct_answer": "Mitochondria",
+      "incorrect_answers": ["Nucleus", "Ribosome", "Chloroplast"]
+    }
+  ]
+}

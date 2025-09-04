@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "question": "Which element has the chemical symbol 'Fe'?",
+      "correct_answer": "Iron",
+      "incorrect_answers": ["Fluorine", "Lead", "Zinc"]
+    },
+    {
+      "question": "In computing, what does 'CPU' stand for?",
+      "correct_answer": "Central Processing Unit",
+      "incorrect_answers": [
+        "Central Power Unit",
+        "Computer Processing Utility",
+        "Control Program Unit"
+      ]
+    },
+    {
+      "question": "Which year did World War II end?",
+      "correct_answer": "1945",
+      "incorrect_answers": ["1939", "1940", "1942"]
+    },
+    {
+      "question": "Which gas do plants absorb from the atmosphere for photosynthesis?",
+      "correct_answer": "Carbon Dioxide",
+      "incorrect_answers": ["Oxygen", "Nitrogen", "Hydrogen"]
+    },
+    {
+      "question": "Which programming language is known as the backbone of the web?",
+      "correct_answer": "JavaScript",
+      "incorrect_answers": ["Python", "C++", "Java"]
+    }
+  ]
+}

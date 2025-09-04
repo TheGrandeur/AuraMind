@@ -1,0 +1,29 @@
+{
+  "results": [
+    {
+      "question": "What is the capital city of France?",
+      "correct_answer": "Paris",
+      "incorrect_answers": ["Madrid", "Rome", "Berlin"]
+    },
+    {
+      "question": "Which planet is closest to the Sun?",
+      "correct_answer": "Mercury",
+      "incorrect_answers": ["Venus", "Mars", "Earth"]
+    },
+    {
+      "question": "Which animal is known as 'Man’s Best Friend'?",
+      "correct_answer": "Dog",
+      "incorrect_answers": ["Cat", "Horse", "Rabbit"]
+    },
+    {
+      "question": "What is the largest mammal on Earth?",
+      "correct_answer": "Blue Whale",
+      "incorrect_answers": ["Elephant", "Giraffe", "Great White Shark"]
+    },
+    {
+      "question": "Which primary color do you get when you mix red and blue?",
+      "correct_answer": "Purple",
+      "incorrect_answers": ["Green", "Orange", "Yellow"]
+    }
+  ]
+}
