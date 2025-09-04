@@ -1,55 +1,51 @@
 /**
  * Results.jsx
  * Displays quiz results, high score tracking, and detailed answer breakdown.
- * Integrates Confetti animation for new high scores.
+ * Confetti animation runs every time the page loads.
  */
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import Confetti from "react-confetti"; // 🎉 for celebrating new high scores
+import Confetti from "react-confetti";
 import PrimaryButton from "../components/PrimaryButton";
 
 export default function Results() {
-  const location = useLocation(); // get state passed from Quiz page
-  const navigate = useNavigate(); // navigation helper
-  const state = location.state || {}; // handle undefined state
-  const answers = state.answers || []; // array of user's answers
+  const location = useLocation();
+  const navigate = useNavigate();
+  const state = location.state || {};
+  const answers = state.answers || [];
 
-  // --- Compute score from answers ---
   const score = useMemo(() => answers.filter((a) => a.isCorrect).length, [answers]);
-  const difficulty = state.difficulty || "easy"; // default to easy
+  const difficulty = state.difficulty || "easy";
 
-  const [highScore, setHighScore] = useState(0); // stores high score from localStorage
-  const [showConfetti, setShowConfetti] = useState(false); // trigger confetti animation
+  const [highScore, setHighScore] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
 
-  /**
-   * Store and compare high scores using localStorage.
-   * If current score beats previous high score, show confetti.
-   */
+  // --- Trigger confetti on every page load ---
   useEffect(() => {
+    setShowConfetti(true); // show confetti every time
+
+    // Update high score in localStorage
     const key = `quiz_highscore_${difficulty}`;
     const existing = Number(localStorage.getItem(key) || 0);
-
     if (score > existing) {
       localStorage.setItem(key, String(score));
       setHighScore(score);
-      setShowConfetti(true); // trigger celebration
     } else {
       setHighScore(existing);
     }
   }, [score, difficulty]);
 
-  // --- Navigation handlers ---
+  // Optional: navigation handlers
   function restart() {
-    navigate("/quiz", { state: { difficulty } }); // restart quiz with same difficulty
+    navigate("/quiz", { state: { difficulty } });
   }
 
   function goHome() {
-    navigate("/"); // navigate back to home page
+    navigate("/");
   }
 
-  // --- Render fallback if no quiz has been taken ---
   if (!answers.length) {
     return (
       <motion.div
@@ -68,7 +64,6 @@ export default function Results() {
     );
   }
 
-  // --- Main results view ---
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -77,10 +72,10 @@ export default function Results() {
       transition={{ duration: 0.25 }}
       className="max-w-3xl mx-auto grid gap-6 mt-8 relative"
     >
-      {/* Confetti animation if new high score */}
+      {/* Confetti animation */}
       {showConfetti && <Confetti numberOfPieces={300} recycle={false} gravity={0.2} />}
 
-      {/* Quiz summary card */}
+      {/* Quiz summary */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -96,13 +91,12 @@ export default function Results() {
         </p>
 
         <div className="flex items-center justify-center gap-3">
-          {/* Action buttons */}
           <PrimaryButton onClick={goHome}>Go to Home</PrimaryButton>
           <PrimaryButton onClick={restart}>Restart Quiz</PrimaryButton>
         </div>
       </motion.div>
 
-      {/* Detailed answer breakdown */}
+      {/* Answer breakdown */}
       <div className="bg-white rounded-2xl p-6 shadow">
         <h3 className="text-lg font-semibold mb-3">Answer Breakdown</h3>
         <div className="space-y-4">
@@ -111,17 +105,13 @@ export default function Results() {
               key={idx}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, delay: idx * 0.05 }} // staggered animation
+              transition={{ duration: 0.25, delay: idx * 0.05 }}
               className="p-4 rounded-lg border"
             >
-              {/* Question */}
               <div className="mb-2 text-gray-700 font-medium">
                 Q{idx + 1}: {a.question}
               </div>
-
-              {/* Answers */}
               <div className="text-sm space-y-1">
-                {/* User's answer with color based on correctness */}
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -130,8 +120,6 @@ export default function Results() {
                 >
                   Your answer: {a.selected ?? "(no answer)"}
                 </motion.div>
-
-                {/* Correct answer */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -139,8 +127,6 @@ export default function Results() {
                 >
                   Correct answer: <span className="font-medium">{a.correct}</span>
                 </motion.div>
-
-                {/* Timeout info */}
                 {a.timedOut && (
                   <motion.div
                     initial={{ opacity: 0 }}
