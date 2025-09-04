@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { fetchQuestionsForDifficulty } from "../utils/api";
 import QuestionCard from "../components/QuestionCard";
 import ProgressBar from "../components/ProgressBar";
+import PrimaryButton from "../components/PrimaryButton"; // ✅ add PrimaryButton
 
 export default function Quiz() {
   const location = useLocation();
@@ -13,11 +14,10 @@ export default function Quiz() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState([]); // {selected, correct, question}
+  const [answers, setAnswers] = useState([]); 
   const [selected, setSelected] = useState(null);
   const [locked, setLocked] = useState(false);
 
-  // Timer
   const [timeLeft, setTimeLeft] = useState(30);
   const timerRef = useRef(null);
 
@@ -36,22 +36,16 @@ export default function Quiz() {
   }, [difficulty]);
 
   useEffect(() => {
-    // reset when question changes
     setSelected(null);
     setLocked(false);
     setTimeLeft(30);
     if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((t) => t - 1);
-    }, 1000);
+    timerRef.current = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timerRef.current);
   }, [index, questions]);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      // lock and move on automatically after 700ms
-      handleLockSelection(null, true);
-    }
+    if (timeLeft <= 0) handleLockSelection(null, true);
   }, [timeLeft]);
 
   function handleSelect(opt) {
@@ -59,7 +53,6 @@ export default function Quiz() {
   }
 
   function handleLockSelection(opt = null, timedOut = false) {
-    // lock current selection, compute immediate correctness
     const current = questions[index];
     const sel = opt === null ? selected : opt;
     const record = {
@@ -67,24 +60,33 @@ export default function Quiz() {
       selected: sel,
       correct: current.correct_answer,
       isCorrect: sel === current.correct_answer,
-      timedOut: timedOut && sel == null
+      timedOut: timedOut && sel == null,
     };
     setAnswers((prev) => [...prev, record]);
     setLocked(true);
-    // small delay then move
+
     setTimeout(() => {
       if (index + 1 < questions.length) {
         setIndex((i) => i + 1);
       } else {
-        // finish -> go to results
         navigate("/results", { state: { answers: [...answers, record], difficulty } });
       }
     }, 700);
   }
 
   function handleNext() {
-    if (!selected) return; // prevent move
+    if (!selected) return;
     handleLockSelection(selected, false);
+  }
+
+  function handleSkip() {
+    handleLockSelection(null, false);
+  }
+
+  function handlePrevious() {
+    if (index === 0) return;
+    setIndex((i) => i - 1);
+    setAnswers((prev) => prev.slice(0, -1));
   }
 
   function handleFinish() {
@@ -102,8 +104,12 @@ export default function Quiz() {
     <div className="max-w-2xl mx-auto grid gap-6">
       <div className="bg-white rounded-2xl p-6 shadow">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">Difficulty: <strong className="capitalize">{difficulty}</strong></div>
-          <div className="text-sm text-gray-600">Time: <strong>{timeLeft}s</strong></div>
+          <div className="text-sm text-gray-600">
+            Difficulty: <strong className="capitalize">{difficulty}</strong>
+          </div>
+          <div className="text-sm text-gray-600">
+            Time: <strong>{timeLeft}s</strong>
+          </div>
         </div>
 
         <div className="mt-4">
@@ -118,31 +124,35 @@ export default function Quiz() {
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 rounded-lg border hover:bg-red-100"
+        <div className="mt-4 flex items-center justify-between flex-wrap gap-2">
+          {/* Previous Button (Green Gradient) */}
+          <PrimaryButton
+            onClick={handlePrevious}
+            disabled={index === 0}
+            className="bg-gradient-to-r from-green-500 to-green-600"
           >
-            Cancel
-          </button>
+            Previous
+          </PrimaryButton>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Skip Button (Red Gradient) */}
+            <PrimaryButton
+              onClick={handleSkip}
+              disabled={locked}
+              className="bg-gradient-to-r from-red-500 to-red-600"
+            >
+              Skip
+            </PrimaryButton>
+
+            {/* Next / Finish Buttons (Blue Gradient Default) */}
             {index + 1 < questions.length ? (
-              <button
-                onClick={handleNext}
-                className={`px-4 py-2 rounded-lg text-white ${selected ? "bg-brand-900" : "bg-gray-300 cursor-not-allowed"}`}
-                aria-disabled={!selected}
-              >
+              <PrimaryButton onClick={handleNext} disabled={!selected}>
                 Next
-              </button>
+              </PrimaryButton>
             ) : (
-              <button
-                onClick={handleFinish}
-                className={`px-4 py-2 rounded-lg text-white ${selected ? "bg-brand-900" : "bg-gray-300 cursor-not-allowed"}`}
-                aria-disabled={!selected}
-              >
+              <PrimaryButton onClick={handleFinish} disabled={!selected}>
                 Finish Quiz
-              </button>
+              </PrimaryButton>
             )}
           </div>
         </div>
