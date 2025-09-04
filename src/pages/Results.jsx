@@ -43,7 +43,7 @@ export default function Results() {
   return (
     <div className="max-w-3xl mx-auto grid gap-6">
       <div className="bg-white rounded-2xl p-6 shadow text-center">
-        <h2 className="text-2xl font-bold mb-2">Results</h2>
+        <h2 className="text-2xl font-bold mb-2">Your Quiz Result</h2>
         <p className="text-gray-700 mb-3">You scored <strong>{score}/{answers.length}</strong></p>
         <p className="text-sm text-gray-500 mb-3">High Score ({state.difficulty || "easy"}): {highScore}/{answers.length}</p>
 

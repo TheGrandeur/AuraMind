@@ -2,11 +2,23 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Zap, Brain, Target, ArrowLeft } from "lucide-react";
 
+// Import local data to read question count
+import easyData from "../data/easy.json";
+import mediumData from "../data/medium.json";
+import hardData from "../data/hard.json";
+
 export default function Difficulty() {
   const navigate = useNavigate();
 
   const handleSelect = (level) => {
     navigate("/quiz", { state: { difficulty: level } });
+  };
+
+  // ✅ Dynamic question counts
+  const questionCounts = {
+    easy: easyData.results.length,
+    medium: mediumData.results.length,
+    hard: hardData.results.length,
   };
 
   return (
@@ -39,7 +51,7 @@ export default function Difficulty() {
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Easy</h2>
           <p className="text-sm text-gray-600 mb-6">
-            Perfect for beginners – gentle questions to get you started
+            Contains {questionCounts.easy} beginner-friendly questions
           </p>
           <button
             onClick={() => handleSelect("easy")}
@@ -56,7 +68,7 @@ export default function Difficulty() {
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Medium</h2>
           <p className="text-sm text-gray-600 mb-6">
-            Ready for a challenge? Test your knowledge here
+            Contains {questionCounts.medium} challenging questions
           </p>
           <button
             onClick={() => handleSelect("medium")}
@@ -73,7 +85,7 @@ export default function Difficulty() {
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Hard</h2>
           <p className="text-sm text-gray-600 mb-6">
-            Expert level – only for the truly brave!
+            Contains {questionCounts.hard} expert-level questions
           </p>
           <button
             onClick={() => handleSelect("hard")}
@@ -86,7 +98,7 @@ export default function Difficulty() {
 
       {/* Footer note */}
       <p className="text-gray-400 text-sm mt-12">
-        Each quiz contains 5 carefully selected questions with a 30-second timer per question
+        Each quiz dynamically loads its set of questions from local data
       </p>
     </div>
   );

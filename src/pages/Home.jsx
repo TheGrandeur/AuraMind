@@ -21,11 +21,16 @@ export default function Home() {
             <Zap className="w-7 h-7 text-purple-600" />
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Challenge Your Mind
+            Challenge Your Mind,
+            <br />
+            Farm some Aura Points
           </h2>
           <p className="text-gray-600 mb-6">
-            Test your knowledge with engaging trivia questions across multiple
-            difficulty levels. Track your progress and compete for the highest score!
+            Farm your aura like a pro across multiple difficulty levels.
+            <br />
+            Track your “unstoppable” progress and flex that highest score aura
+            <br />
+            "If you can even get there. 😏"
           </p>
           <Link
             to="/difficulty"

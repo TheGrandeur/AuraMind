@@ -34,7 +34,7 @@ export default function App() {
         </div>
       </main>
       <footer className="text-center text-xl bg-gradient-to-r from-purple-700 to-indigo-800 text-white shadow">
-        Built with ❤️ • Vaibhabv Gupta
+        Built with ❤️ • Vaibhav Gupta
       </footer>
     </div>
   );
